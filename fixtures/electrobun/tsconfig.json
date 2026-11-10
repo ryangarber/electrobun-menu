@@ -1,0 +1,7 @@
+{
+	"extends": ["./.hutch/devkit/tsconfig.json", "../../tsconfig.base.json"],
+	"compilerOptions": {
+		"baseUrl": null
+	},
+	"exclude": ["node_modules", "dist", "build", "../../package/dist"]
+}

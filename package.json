@@ -1,0 +1,101 @@
+{
+	"name": "electrobun-menu",
+	"type": "module",
+	"version": "0.1.0",
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.cjs",
+			"types": "./dist/index.d.mts"
+		},
+		"./menu": {
+			"import": "./dist/menu.mjs",
+			"require": "./dist/menu.cjs",
+			"types": "./dist/menu.d.mts"
+		},
+		"./react": {
+			"types": "./dist/react.d.mts"
+		},
+		"./preact": {
+			"types": "./dist/preact.d.mts"
+		},
+		"./solid": {
+			"types": "./dist/solid.d.mts"
+		},
+		"./svelte": {
+			"types": "./dist/svelte.d.mts"
+		},
+		"./vue": {
+			"types": "./dist/vue.d.mts"
+		}
+	},
+	"sideEffects": [
+		"./dist/menu.mjs",
+		"./dist/menu.cjs"
+	],
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"lint": "pnpm -r lint && biome check --write .",
+		"typecheck": "pnpm -r typecheck && tsc --noEmit",
+		"build": "pnpm -r build && tsdown",
+		"test": "pnpm -r test && pnpm vitest run"
+	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": ">=24 <27",
+			"onFail": "download"
+		}
+	},
+	"packageManager": "pnpm@12.18.0",
+	"peerDependencies": {
+		"@types/react": ">=19",
+		"preact": ">=11",
+		"solid-js": ">=1.8",
+		"svelte": ">=5",
+		"vue": ">=3.5"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"preact": {
+			"optional": true
+		},
+		"solid-js": {
+			"optional": true
+		},
+		"svelte": {
+			"optional": true
+		},
+		"vue": {
+			"optional": true
+		}
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.6.6",
+		"@types/bun": "^1.4.4",
+		"@types/node": "^26.6.6",
+		"@types/react": "^19.3.0",
+		"concurrently": "^10.0.7",
+		"electrobun": "^2.0.6",
+		"happy-dom": "^21.0.4",
+		"knip": "^6.44.2",
+		"preact": "^11.2.0",
+		"solid-js": "^1.9.18",
+		"svelte": "^5.57.3",
+		"tsdown": "^0.23.7",
+		"typescript": "7.1.0-beta",
+		"vitest": "^5.1.0",
+		"vue": "^3.5.45"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ryangarber/electrobun-menu.git"
+	}
+}

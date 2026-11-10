@@ -1,0 +1,71 @@
+name: release-cli
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "Version to release, without its tag's v"
+        required: true
+        type: string
+      notes:
+        description: "Release notes/changelog to include in the release body"
+        required: false
+        type: string
+      ref:
+        description: "What to build, if not the version's tag"
+        required: false
+        type: string
+      dry_run:
+        description: "Build but publish nothing"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  release:
+    # Cross-compiles every OS's build; on macOS, so the macOS builds can be
+    # signed (ad hoc), which Apple Silicon requires to run them.
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    env:
+      # Always, off main.
+      DRY_RUN: ${{ inputs.dry_run || github.ref_name != 'main' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || format('v{0}', inputs.version) }}
+
+      - name: Install dependencies
+        uses: pnpm/setup@v3
+        with:
+          cache: true
+
+      # A dry run builds a commit whose version rylease never wrote; the
+      # binary reports the version it was built with.
+      - name: Write version
+        if: env.DRY_RUN == 'true'
+        env:
+          VERSION: ${{ inputs.version }}
+        run: pnpm pkg set "version=$VERSION"
+
+      - name: Build
+        run: pnpm build:cli --target all --out "$RUNNER_TEMP/cli-artifacts"
+
+      - name: Publish
+        uses: ryangarber/rylease@v3
+        with:
+          version: ${{ inputs.version }}
+          notes: ${{ inputs.notes }}
+          dry-run: ${{ env.DRY_RUN }}
+          # No preset here to give them.
+          scheme: semver
+          history: git/tags
+          steps: |
+            - uses: github/upload-release-assets
+              with:
+                files: ['${{ runner.temp }}/cli-artifacts/markitdown-*']
+                dryRunArtifact: true
+                artifactName: cli-binaries

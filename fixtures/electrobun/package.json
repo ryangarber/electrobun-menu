@@ -1,0 +1,17 @@
+{
+	"name": "electrobun-fixture",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"lint": "electrobun prepare && biome check --write .",
+		"typecheck": "electrobun prepare && tsc --noEmit",
+		"build": "electrobun prepare && vite build && electrobun build",
+		"dev": "concurrently \"vite\" \"electrobun dev\"",
+		"dev:watch": "concurrently \"vite\" \"electrobun dev --watch\"",
+		"test": "vitest run",
+		"electrobun": "electrobun"
+	},
+	"dependencies": {
+		"vite": "^8.3.7"
+	}
+}

@@ -1,0 +1,9 @@
+{
+	"extends": [
+		"./fixtures/electrobun/.hutch/devkit/tsconfig.json",
+		"./tsconfig.base.json"
+	],
+	"compilerOptions": {
+		"baseUrl": null
+	}
+}
