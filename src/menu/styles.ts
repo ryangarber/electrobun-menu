@@ -7,6 +7,14 @@ export const baseStyles: string = `
 :host([autohide]:not([active])) {
 	display: none !important;
 }
+/* Shown over the page rather than in its flow, so Alt doesn't reflow it. */
+:host([autohide][active]) {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 2147483646;
+}
 [part~="menu"] {
 	position: fixed;
 	inset: auto;
@@ -34,6 +42,7 @@ export const defaultStyles: string = `
 	--ebm-bar-height: 28px;
 	--ebm-bar-padding: 0 4px;
 	--ebm-bar-bg: transparent;
+	--ebm-overlay-bar-bg: Canvas;
 	--ebm-bar-fg: inherit;
 	--ebm-bar-border: 1px solid rgb(0 0 0 / 0.08);
 	--ebm-bar-item-padding: 0 8px;
@@ -86,6 +95,9 @@ export const defaultStyles: string = `
 	background: var(--ebm-bar-bg);
 	border-bottom: var(--ebm-bar-border);
 	box-sizing: border-box;
+}
+:host([autohide]) [part~="bar"] {
+	background: var(--ebm-overlay-bar-bg);
 }
 [part~="bar-item"] {
 	display: flex;

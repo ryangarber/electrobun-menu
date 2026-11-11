@@ -140,6 +140,21 @@ Methods: `openMenu(index?)`, `focusMenuBar()`, and `close()`.
 
 Events (all bubble and are composed): `menuselect` (cancelable; call `preventDefault()` to stop the role from running or the click from being forwarded), `menuopen`, `menuclose`, and `menumodechange`.
 
+### Layout
+
+The bar sits in the page's flow, so a page whose content follows it in normal flow needs nothing. A layout sized to the viewport (`100vh`, `100dvh`, `innerHeight`, or fixed-position panels) doesn't see the bar and would run past the bottom by its height. For those, the element keeps `--electrobun-menu-height` on `<html>` set to the height the bar takes. That's `0px` while it's empty or autohidden, since an activated `autohide` bar overlays the page instead of pushing it down. Use it the way you'd use `env(safe-area-inset-top)`:
+
+```css
+#app {
+	height: calc(100dvh - var(--electrobun-menu-height, 0px));
+}
+.fixed-sidebar {
+	top: var(--electrobun-menu-height, 0px);
+}
+```
+
+The overlaid autohide bar has a solid background, `--ebm-overlay-bar-bg` (default `Canvas`).
+
 ### Styling
 
 The default theme follows the system light/dark preference. Customize it with CSS custom properties, `::part()`, or both:

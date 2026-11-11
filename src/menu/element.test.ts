@@ -266,6 +266,29 @@ describe("<electrobun-menu>", () => {
 		expect(el.hasAttribute("active")).toBe(false);
 	});
 
+	it("publishes the height the bar takes in the page's layout", () => {
+		const root = document.documentElement.style;
+		const height = () => root.getPropertyValue("--electrobun-menu-height");
+		const el = mount((menu) => {
+			menu.getBoundingClientRect = () => ({ height: 28 }) as DOMRect;
+		});
+		expect(height()).toBe("28px");
+
+		// An autohidden bar overlays the page, so it takes no room in it.
+		el.autohide = true;
+		expect(height()).toBe("0px");
+		el.autohide = false;
+		expect(height()).toBe("28px");
+
+		el.items = [];
+		expect(height()).toBe("0px");
+		el.items = items;
+		expect(height()).toBe("28px");
+
+		el.remove();
+		expect(height()).toBe("");
+	});
+
 	it("uses role handlers before built-in role behavior", () => {
 		const el = mount();
 		const undo = vi.fn();

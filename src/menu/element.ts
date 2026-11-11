@@ -210,7 +210,16 @@ function isMenuState(value: unknown): value is MenuStatePayload {
 // biome-ignore lint/suspicious/noUnsafeDeclarationMerging: the interface only adds typed event listener overloads
 export class ElectrobunMenuElement extends HTMLElementBase {
 	static readonly tagName = "electrobun-menu";
-	static readonly observedAttributes = ["mode", "os", "unstyled"];
+	static readonly observedAttributes = ["mode", "os", "unstyled", "autohide"];
+
+	/**
+	 * The custom property on `<html>` holding the height the bar takes in the
+	 * page's layout: `0px` while it's empty or autohidden (an activated
+	 * autohidden bar overlays the page instead). A layout sized to the
+	 * viewport (`100vh`, `100dvh`, `innerHeight`, fixed panels) subtracts it
+	 * or offsets by it, as it would `env(safe-area-inset-top)`.
+	 */
+	static readonly heightProperty = "--electrobun-menu-height";
 
 	/** Handlers for roles selected in this webview, checked before the built-in ones. */
 	roleHandlers: Partial<Record<MenuRole, WebviewRoleHandler>> = {};
@@ -232,6 +241,8 @@ export class ElectrobunMenuElement extends HTMLElementBase {
 	#listening = false;
 	#altPending = false;
 	#hoverTimer: ReturnType<typeof setTimeout> | undefined;
+	#resizeObserver: ResizeObserver | undefined;
+	#publishedHeight: string | undefined;
 
 	constructor() {
 		super();
@@ -350,15 +361,26 @@ export class ElectrobunMenuElement extends HTMLElementBase {
 	connectedCallback() {
 		this.#subscribe();
 		this.#update();
+		if (typeof ResizeObserver !== "undefined") {
+			this.#resizeObserver ??= new ResizeObserver(() => this.#publishHeight());
+			this.#resizeObserver.observe(this);
+		}
+		this.#publishHeight();
 	}
 
 	disconnectedCallback() {
 		this.close();
 		this.#unsubscribe();
 		this.#listen(false);
+		this.#resizeObserver?.disconnect();
+		this.#publishHeight();
 	}
 
 	attributeChangedCallback(name: string) {
+		if (name === "autohide") {
+			this.#publishHeight();
+			return;
+		}
 		if (name === "unstyled") {
 			this.#themeStyle.disabled = this.unstyled;
 			this.#themeStyle.textContent = this.unstyled ? "" : defaultStyles;
@@ -437,6 +459,7 @@ export class ElectrobunMenuElement extends HTMLElementBase {
 		);
 		this.toggleAttribute("empty", empty);
 		this.#listen(this.isConnected && !empty);
+		this.#publishHeight();
 		if (changed && this.isConnected) this.#emit("menumodechange", { mode });
 	}
 
@@ -630,6 +653,23 @@ export class ElectrobunMenuElement extends HTMLElementBase {
 				el.scrollIntoView?.({ block: "nearest" });
 			}
 		}
+	}
+
+	/** Sets {@link ElectrobunMenuElement.heightProperty}, or clears it once disconnected. */
+	#publishHeight() {
+		const style = this.ownerDocument?.documentElement?.style;
+		if (!style) return;
+		const name = ElectrobunMenuElement.heightProperty;
+		if (!this.isConnected) {
+			if (this.#publishedHeight !== undefined) style.removeProperty(name);
+			this.#publishedHeight = undefined;
+			return;
+		}
+		const inFlow = !this.autohide && !this.hasAttribute("empty");
+		const height = `${inFlow ? this.getBoundingClientRect().height : 0}px`;
+		if (height === this.#publishedHeight) return;
+		this.#publishedHeight = height;
+		style.setProperty(name, height);
 	}
 
 	#setActive(active: boolean, keyboard = false) {
