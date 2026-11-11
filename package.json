@@ -5,12 +5,10 @@
 	"exports": {
 		".": {
 			"import": "./dist/index.mjs",
-			"require": "./dist/index.cjs",
 			"types": "./dist/index.d.mts"
 		},
 		"./menu": {
 			"import": "./dist/menu.mjs",
-			"require": "./dist/menu.cjs",
 			"types": "./dist/menu.d.mts"
 		},
 		"./react": {
@@ -30,11 +28,9 @@
 		}
 	},
 	"sideEffects": [
-		"./dist/menu.mjs",
-		"./dist/menu.cjs"
+		"./dist/menu.mjs"
 	],
-	"main": "./dist/index.cjs",
-	"module": "./dist/index.mjs",
+	"main": "./dist/index.mjs",
 	"types": "./dist/index.d.mts",
 	"files": [
 		"dist"

@@ -20,7 +20,7 @@ permissions:
   id-token: write
 
 jobs:
-  version:
+  release:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
